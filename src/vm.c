@@ -17,13 +17,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include <memory.h>
+#include <string.h>
 #include "vm.h"
 
 #define MAX_VARIABLES 256
 
 short variables[MAX_VARIABLES];
-static unsigned char memory[512*1024*2]; 
+static unsigned char memory[512*1024*2];
 
 int auxptr;
 static int using_aux = 0;

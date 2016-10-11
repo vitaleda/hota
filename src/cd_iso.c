@@ -120,22 +120,6 @@ int read_file(const char *filename, void *out)
 			strcpy(archive, ISO_FILENAME);
 		}
 	}
-	else
-	{
-		const char *cdname = SDL_CDName(0);
-
-		if (cdname != NULL)
-		{
-			strcpy(archive, cdname);
-			strcat(archive, filename);
-		}
-		else
-		{
-			strcpy(archive, filename);
-		}
-
-		offset = 0;
-	}
 
 	return read_file_internal(archive, size, offset, out);
 }

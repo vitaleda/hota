@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <memory.h>
 #include <assert.h>
 #include <SDL.h>
 #include <SDL_mixer.h>
@@ -139,7 +138,7 @@ static void atexit_callback(void)
 
 static int initialize()
 {
-	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_CDROM|SDL_INIT_AUDIO);
+	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
 	atexit(atexit_callback);
 
 	if (cls.nosound == 0)
