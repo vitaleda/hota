@@ -101,6 +101,12 @@ static unsigned char cached_recorded_keys[RECORDED_KEYS_CACHE];
 /** file descriptor where keys are written to, or read from */
 FILE *record_fp = 0;
 
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+SDL_Window *window;
+SDL_Renderer *renderer;
+SDL_Surface *_screen;
+SDL_Texture *texture;
+#endif
 SDL_Surface *screen;
 
 /** scratchpad used for unpacking code */
@@ -771,6 +777,29 @@ int play_anm(anm_file_t *anm, int n, int skippable)
 	return ret;
 }
 
+void draw_screen()
+{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+	void *pixels;
+	int pitch;
+
+	SDL_BlitSurface(screen, NULL, _screen, NULL);
+	SDL_LockTexture(texture, NULL, &pixels, &pitch);
+	SDL_ConvertPixels(_screen->w, _screen->h,
+		_screen->format->format,
+		_screen->pixels, _screen->pitch,
+		SDL_PIXELFORMAT_RGB888,
+		pixels, pitch);
+	SDL_UnlockTexture(texture);
+	SDL_UpdateTexture(texture, NULL, _screen->pixels, _screen->pitch);
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
+	SDL_RenderPresent(renderer);
+#else
+	SDL_UpdateRect(screen, 0, 0, 0, 0);
+#endif
+}
+
 /** Plays the introduction to the game
 
     Introduction is split into 4 files, since sega-cd was limited with
@@ -873,8 +902,8 @@ static void run()
 			}
 		}
 
-		SDL_UpdateRect(screen, 0, 0, 0, 0);
-                music_update();
+		draw_screen();
+		music_update();
 
 		rest(12);
 	}
@@ -927,7 +956,7 @@ void sprite_test()
 
 			render_sprite(0);
 			render(background);
-			SDL_UpdateRect(screen, 0, 0, 0, 0);
+			draw_screen();
 			redraw = 0;
 			print_sprite(0);
 		}

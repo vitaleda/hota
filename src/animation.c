@@ -54,7 +54,7 @@ static void copy_to_screen(int a4)
 {
 	//set_scroll(0); /////////
 	render((char *)screen0 + a4);
-	SDL_UpdateRect(screen, 0, 0, 0, 0);
+	draw_screen();
 }
 
 static void draw_pixel(unsigned char *out, int offset, int color)

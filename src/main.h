@@ -3,5 +3,6 @@
 
 void update_keys();
 void check_events();
+void draw_screen();
 
 #endif

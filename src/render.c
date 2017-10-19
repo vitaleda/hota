@@ -26,11 +26,18 @@
 #include "scale2x.h"
 #include "scale3x.h"
 #include "scale800x480.h"
+#include "main.h"
 
 static int fullscreen = 0;
 static int scroll_reg = 0;
 
 extern int fullscreen_flag;
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+extern SDL_Window *window;
+extern SDL_Renderer *renderer;
+extern SDL_Surface *_screen;
+extern SDL_Texture *texture;
+#endif
 extern SDL_Surface *screen;
 
 static int palette_changed = 0;
@@ -343,7 +350,11 @@ void render(char *src)
 	if (palette_changed)
 	{
 		palette_changed = 0;
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+		SDL_SetPaletteColors(screen->format->palette, palette, 0, 256);
+#else
 		SDL_SetColors(screen, palette, 0, 256);
+#endif
 	}
 
 	switch(cls.scale)
@@ -392,7 +403,11 @@ void render(char *src)
 
 	scroll_reg = 0;
 	SDL_UnlockSurface(screen);
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+	draw_screen();
+#else
 	SDL_Flip(screen);
+#endif
 }
 
 /** Module initializer
@@ -459,13 +474,26 @@ void toggle_fullscreen()
 
 		if (cls.pandora && (cls.scale == 3))
 		{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+			screen = SDL_CreateRGBSurface(0, 800, 480, 8, 0, 0, 0, 0);
+#else
 			screen = SDL_SetVideoMode(800, 480, 8, SDL_SWSURFACE);
+#endif
 		}
 		else
 		{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+			screen = SDL_CreateRGBSurface(0, 304*cls.scale, 192*cls.scale, 8, 0, 0, 0, 0);
+#else
 			screen = SDL_SetVideoMode(304*cls.scale, 192*cls.scale, 8, SDL_SWSURFACE);
+#endif
 		}
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+		SDL_SetWindowFullscreen(window, 0);
+		SDL_SetPaletteColors(screen->format->palette, palette, 0, 256);
+#else
 		SDL_SetColors(screen, palette, 0, 256);
+#endif
 		SDL_ShowCursor(1);
 	}
 	else
@@ -484,14 +512,27 @@ void toggle_fullscreen()
 
 		if (cls.pandora && (cls.scale == 3))
 		{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+			screen = SDL_CreateRGBSurface(0, 800, 480, 8, 0, 0, 0, 0);
+#else
 			screen = SDL_SetVideoMode(800, 480, 8, SDL_DOUBLEBUF|SDL_HWSURFACE|SDL_FULLSCREEN);
+#endif
 		}
 		else
 		{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+			screen = SDL_CreateRGBSurface(0, 304*cls.scale, 192*cls.scale , 8, 0, 0, 0, 0);
+#else
 			screen = SDL_SetVideoMode(w, h, 8, SDL_DOUBLEBUF|SDL_HWSURFACE|SDL_FULLSCREEN);
+#endif
 		}
 
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		SDL_SetPaletteColors(screen->format->palette, palette, 0, 256);
+#else
 		SDL_SetColors(screen, palette, 0, 256);
+#endif
 		SDL_ShowCursor(0);
 	}
 }
@@ -500,18 +541,38 @@ int render_create_surface()
 {
 	if (cls.pandora && (cls.scale == 3))
 	{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+		window = SDL_CreateWindow("Heart of The Alien Redux", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+			800, 400, SDL_SWSURFACE);
+		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+		screen = SDL_CreateRGBSurface(0, 800, 400, 8, 0, 0, 0, 0);
+		_screen = SDL_CreateRGBSurface(0, 800, 400, 8, 0, 0, 0, 0);
+		texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, 800, 400);
+#else
 		screen = SDL_SetVideoMode(800, 480, 8, SDL_SWSURFACE);
+#endif
 	}
 	else
 	{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+		window = SDL_CreateWindow("Heart of The Alien Redux", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+			304*cls.scale, 192*cls.scale, SDL_SWSURFACE);
+		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+		screen = SDL_CreateRGBSurface(0, 304*cls.scale, 192*cls.scale, 8, 0, 0, 0, 0);
+		_screen = SDL_CreateRGBSurface(0, 304*cls.scale, 192*cls.scale, 32, 0, 0, 0, 0);
+		texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, 304*cls.scale, 192*cls.scale);
+#else
 		screen = SDL_SetVideoMode(304*cls.scale, 192*cls.scale, 8, SDL_SWSURFACE);
+#endif
 	}
 	if (screen == NULL)
 	{
 		return -1;
 	}
 
+#if !SDL_VERSION_ATLEAST(2, 0, 0)
 	SDL_WM_SetCaption("Heart of The Alien Redux", 0);
+#endif
 
 	if (fullscreen_flag)
 	{
