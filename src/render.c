@@ -32,11 +32,14 @@ static int fullscreen = 0;
 static int scroll_reg = 0;
 
 extern int fullscreen_flag;
+
 #if SDL_VERSION_ATLEAST(2, 0, 0)
 extern SDL_Window *window;
 extern SDL_Renderer *renderer;
 extern SDL_Surface *_screen;
 extern SDL_Texture *texture;
+#elif __PSP2__
+extern SDL_Surface *mainScreen;
 #endif
 extern SDL_Surface *screen;
 
@@ -403,7 +406,7 @@ void render(char *src)
 
 	scroll_reg = 0;
 	SDL_UnlockSurface(screen);
-#if SDL_VERSION_ATLEAST(2, 0, 0)
+#if SDL_VERSION_ATLEAST(2, 0, 0) || defined(__PSP2__)
 	draw_screen();
 #else
 	SDL_Flip(screen);
@@ -471,7 +474,6 @@ void toggle_fullscreen()
 	if (fullscreen == 0)
 	{
 		LOG(("create SDL surface of 304x192x8\n"));
-
 		if (cls.pandora && (cls.scale == 3))
 		{
 #if SDL_VERSION_ATLEAST(2, 0, 0)
@@ -539,6 +541,18 @@ void toggle_fullscreen()
 
 int render_create_surface()
 {
+#ifdef __PSP2__
+	mainScreen = SDL_SetVideoMode(640, 400, 16, SDL_HWSURFACE|SDL_DOUBLEBUF);
+
+	int sh = 544;
+	float sw = (float)mainScreen->w*((float)sh/(float)mainScreen->h);
+	int x = (960 - sw) / 2;
+	SDL_SetVideoModeScaling(x, 0, sw, sh);
+
+	screen = SDL_SetVideoMode(304, 192, 8, SDL_SWSURFACE);
+
+	SDL_ShowCursor(SDL_DISABLE);
+#else
 	if (cls.pandora && (cls.scale == 3))
 	{
 #if SDL_VERSION_ATLEAST(2, 0, 0)
@@ -578,6 +592,7 @@ int render_create_surface()
 	{
 		toggle_fullscreen();
 	}
+#endif
 
 	return 0;
 }

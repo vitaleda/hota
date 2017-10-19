@@ -40,11 +40,31 @@
 #include "animation.h"
 #include "getopt.h"
 
+#ifdef __PSP2__
+#define VITA_BTN_TRIANGLE 0
+#define VITA_BTN_CIRCLE 1
+#define VITA_BTN_CROSS 2
+#define VITA_BTN_SQUARE 3
+#define VITA_BTN_LTRIGGER 4
+#define VITA_BTN_RTRIGGER 5
+#define VITA_BTN_DOWN 6
+#define VITA_BTN_LEFT 7
+#define VITA_BTN_UP 8
+#define VITA_BTN_RIGHT 9
+#define VITA_BTN_SELECT 10
+#define VITA_BTN_START 11
+#endif
+
 static char *VERSION = "1.2.4";
 
+#ifdef __PSP2__
+static char *QUICKSAVE_FILENAME = "ux0:data/hota/quicksave";
+static char *SWITCH_FILENAME = "ux0:data/hota/temp";
+#else
 static char *QUICKSAVE_FILENAME = "quicksave";
-static char *RECORDED_KEYS_FILENAME = "recorded-keys";
 static char *SWITCH_FILENAME = "temp";
+#endif
+static char *RECORDED_KEYS_FILENAME = "recorded-keys";
 
 typedef struct anm_file_s
 {
@@ -106,6 +126,8 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Surface *_screen;
 SDL_Texture *texture;
+#elif __PSP2__
+SDL_Surface *mainScreen;
 #endif
 SDL_Surface *screen;
 
@@ -146,12 +168,21 @@ static void atexit_callback(void)
 
 static int initialize()
 {
+#ifdef __PSP2__
+	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK);
+	SDL_JoystickOpen(0);
+#else
 	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
+#endif
 	atexit(atexit_callback);
 
 	if (cls.nosound == 0)
 	{
+#ifdef __PSP2__
+		if (Mix_OpenAudio(48000, AUDIO_S16, 2, 4096) < 0)
+#else
 		if (Mix_OpenAudio(44100, AUDIO_S16, 2, 4096) < 0)
+#endif
 		{
 			panic("Mix_OpenAudio failed\n");
 		}
@@ -683,6 +714,46 @@ void check_events()
 			case SDL_QUIT:
 			leave_game();
 			break;
+
+#ifdef __PSP2__
+			case SDL_JOYBUTTONDOWN:
+			switch (event.jbutton.button)
+			{
+				case VITA_BTN_LEFT: key_left = 1; break;
+				case VITA_BTN_RIGHT: key_right = 1; break;
+				case VITA_BTN_UP: key_up = 1; break;
+				case VITA_BTN_DOWN: key_down = 1; break;
+				case VITA_BTN_CIRCLE: key_a = 1; break;
+				case VITA_BTN_SQUARE: key_b = 1; break;
+				case VITA_BTN_CROSS: key_c = 1; break;
+				case VITA_BTN_LTRIGGER: quickload(QUICKSAVE_FILENAME); break;
+				case VITA_BTN_RTRIGGER: quicksave(QUICKSAVE_FILENAME); break;
+				case VITA_BTN_START:
+				if (current_room == 7)
+				{
+					quickload(SWITCH_FILENAME);
+				} else if (current_room != 0)
+				{
+					quicksave(SWITCH_FILENAME);
+					next_script = 7;
+				}
+				break;
+			}
+			break;
+
+			case SDL_JOYBUTTONUP:
+			switch (event.jbutton.button)
+			{
+				case VITA_BTN_LEFT: key_left = 0; break;
+				case VITA_BTN_RIGHT: key_right = 0; break;
+				case VITA_BTN_UP: key_up = 0; break;
+				case VITA_BTN_DOWN: key_down = 0; break;
+				case VITA_BTN_CIRCLE: key_a = 0; break;
+				case VITA_BTN_SQUARE: key_b = 0; break;
+				case VITA_BTN_CROSS: key_c = 0; break;
+			}
+			break;
+#endif
 		}
 	}
 }
@@ -795,6 +866,9 @@ void draw_screen()
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	SDL_RenderPresent(renderer);
+#elif __PSP2__
+	SDL_BlitSurface(screen, NULL, mainScreen, NULL);
+	SDL_Flip(mainScreen);
 #else
 	SDL_UpdateRect(screen, 0, 0, 0, 0);
 #endif
@@ -1067,7 +1141,11 @@ int main(int argc, char **argv)
 	cls.scale = 1;
 	cls.filtered = 0;
 	cls.fullscreen = 0;
+#ifdef __PSP2__
+	cls.use_iso = 1;
+#else
 	cls.use_iso = 0;
+#endif
 	cls.speed_throttle = 0;
 	cls.paused = 0;
 	cls.nosound = 0;

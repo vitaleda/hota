@@ -19,12 +19,19 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <unistd.h>
+#ifdef __PSP2__
+#include <sys/stat.h>
+#endif
 #include "debug.h"
 #include "music.h"
 #include "cd_iso.h"
 #include "client.h"
 
 static Mix_Music *current_track;
+#ifdef __PSP2__
+static FILE *f;
+static char *mem;
+#endif
 
 /** (The Underdogs version of) Heart of The Alien's tracks are formatted like this */
 #define ISO_PREFIX "Heart Of The Alien (U) "
@@ -35,6 +42,16 @@ static void stop_music_mp3()
 	if (current_track != NULL)
 	{
 		Mix_FreeMusic(current_track);
+#ifdef __PSP2__
+		if (f != NULL)
+		{
+			fclose(f);
+		}
+		if (mem != NULL)
+		{
+			free(mem);
+		}
+#endif
 		current_track = NULL;
 	}
 }
@@ -59,11 +76,19 @@ static void play_music_track_mp3(int track, int loop)
 
 	if (cls.iso_prefix != NULL)
 	{
+#ifdef __PSP2__
+		snprintf(filename, 256, "ux0:data/hota/%s %02d.ogg", cls.iso_prefix, track + 1);
+#else
 		snprintf(filename, 256, "%s %02d.ogg", cls.iso_prefix, track + 1);
+#endif
 	}
 	else
 	{
+#ifdef __PSP2__
+		sprintf(filename, "ux0:data/hota/" ISO_PREFIX "%02d.ogg", track + 1);
+#else
 		sprintf(filename, ISO_PREFIX "%02d.ogg", track + 1);
+#endif
 	}
 	// if ogg file doesn't exist use mp3
 	if (access(filename, R_OK))
@@ -79,7 +104,16 @@ static void play_music_track_mp3(int track, int loop)
 	}
 	LOG(("playing mp3 %s\n", filename));
 
+#ifdef __PSP2__
+	struct stat info;
+	stat(filename, &info);
+	f = fopen(filename, "rb");
+	mem = (char*)malloc(info.st_size);
+	fread(mem, 1, info.st_size, f);
+	current_track = Mix_LoadMUS_RW(SDL_RWFromMem(mem, info.st_size));
+#else
 	current_track = Mix_LoadMUS(filename);
+#endif
 	if (!current_track) {
 		fprintf(stderr, "Mix_LoadMUS(\"%s\"): %s\n", filename, Mix_GetError());
 	}
