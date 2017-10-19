@@ -19,6 +19,7 @@ OBJS = $(SRCS:.c=.o)
 all: $(OBJDIR) $(OUTDIR)/alien
 
 $(OUTDIR)/alien: $(addprefix $(OBJDIR)/, $(OBJS))
+	@mkdir -p build
 	$(CC) $^ -o $@ $(SDL_LIBS)
 
 $(OBJDIR):

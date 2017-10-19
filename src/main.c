@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <unistd.h>
 #include <SDL.h>
 #include <SDL_mixer.h>
 
@@ -43,6 +44,7 @@ static char *VERSION = "1.2.4";
 
 static char *QUICKSAVE_FILENAME = "quicksave";
 static char *RECORDED_KEYS_FILENAME = "recorded-keys";
+static char *SWITCH_FILENAME = "temp";
 
 typedef struct anm_file_s
 {
@@ -326,16 +328,26 @@ void update_keys()
 
 /** Loads a quicksave file
 */
-void quickload()
+void quickload(char *filename)
 {
 	int i, j;
 	int palette_used;
 	FILE *fp;
 
-	fp = fopen(QUICKSAVE_FILENAME, "rb");
+	if (current_room == 0)
+	{
+		return;
+	}
+
+	fp = fopen(filename, "rb");
 	if (fp == NULL)
 	{
-		perror("failed to load 'quicksave' file\n");
+		if (filename == SWITCH_FILENAME)
+		{
+			return;
+		}
+		LOG(("failed to load 'quicksave' file\n"));
+		return;
 	}
 
 	current_room = fgetc(fp);
@@ -384,15 +396,25 @@ void quickload()
     Quicksave file includes all that is required so later on a user can
     use the quickload and be provided with the exact same game state.
 */
-void quicksave()
+void quicksave(char *filename)
 {
 	int i, j;
 	FILE *fp;
 
-	fp = fopen(QUICKSAVE_FILENAME, "wb");
+	if (current_room == 0)
+	{
+		return;
+	}
+
+	fp = fopen(filename, "wb");
 	if (fp == NULL)
 	{
-		perror("failed to create 'quicksave' file\n");
+		if (filename == SWITCH_FILENAME)
+		{
+			return;
+		}
+		LOG(("failed to create 'quicksave' file\n"));
+		return;
 	}
 
 	fputc(current_room, fp);
@@ -504,6 +526,17 @@ void check_events()
 				}
 				break;
 
+				case SDLK_p:
+                if (current_room == 7)
+				{
+					quickload(SWITCH_FILENAME);
+				} else if (current_room != 0)
+				{
+					quicksave(SWITCH_FILENAME);
+					next_script = 7;
+				}
+				break;
+
 				case SDLK_q:
 				key_a = 0;
 				key_reset_record = 0;
@@ -609,11 +642,11 @@ void check_events()
 				#endif
 
 				case SDLK_F5:
-				quicksave();
+				quicksave(QUICKSAVE_FILENAME);
 				break;
 
 				case SDLK_F7:
-				quickload();
+				quickload(QUICKSAVE_FILENAME);
 				break;
 
 				case SDLK_RETURN:
@@ -1094,6 +1127,7 @@ int main(int argc, char **argv)
 	}
 
 	initialize();
+	unlink(SWITCH_FILENAME);
 
 	switch(test_flag)
 	{
