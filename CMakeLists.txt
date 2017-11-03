@@ -55,17 +55,13 @@ target_link_libraries(${VITA_APPNAME}
   vorbisfile
   vorbis
   ogg
-  mikmod
-  pthread
   vita2d
-  z
   m
   SceAudio_stub
   SceCtrl_stub
   SceDisplay_stub
   SceGxm_stub
   SceSysmodule_stub
-  SceTouch_stub
 )
 
 # Create Vita artifacts
