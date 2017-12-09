@@ -18,7 +18,7 @@ project(${VITA_APPNAME})
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
 # Flags and includes
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__PSP2__ -I${VITASDK}/arm-vita-eabi/include/SDL -fno-exceptions")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I${VITASDK}/arm-vita-eabi/include/SDL -fno-exceptions")
 
 link_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -65,7 +65,7 @@ target_link_libraries(${VITA_APPNAME}
 )
 
 # Create Vita artifacts
-vita_create_self(eboot.bin ${VITA_APPNAME} SAFE)
+vita_create_self(eboot.bin ${VITA_APPNAME} UNSAFE)
 vita_create_vpk(${VITA_APPNAME}.vpk ${VITA_TITLEID} eboot.bin
   VERSION ${VITA_VERSION}
   NAME ${VITA_APP_NAME}

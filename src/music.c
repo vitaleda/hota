@@ -19,7 +19,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <unistd.h>
-#ifdef __PSP2__
+#ifdef __vita__
 #include <sys/stat.h>
 #endif
 #include "debug.h"
@@ -28,7 +28,7 @@
 #include "client.h"
 
 static Mix_Music *current_track;
-#ifdef __PSP2__
+#ifdef __vita__
 static FILE *f;
 static char *mem;
 #endif
@@ -42,7 +42,7 @@ static void stop_music_mp3()
 	if (current_track != NULL)
 	{
 		Mix_FreeMusic(current_track);
-#ifdef __PSP2__
+#ifdef __vita__
 		if (f != NULL)
 		{
 			fclose(f);
@@ -76,7 +76,7 @@ static void play_music_track_mp3(int track, int loop)
 
 	if (cls.iso_prefix != NULL)
 	{
-#ifdef __PSP2__
+#ifdef __vita__
 		snprintf(filename, 256, "ux0:data/hota/%s %02d.ogg", cls.iso_prefix, track + 1);
 #else
 		snprintf(filename, 256, "%s %02d.ogg", cls.iso_prefix, track + 1);
@@ -84,7 +84,7 @@ static void play_music_track_mp3(int track, int loop)
 	}
 	else
 	{
-#ifdef __PSP2__
+#ifdef __vita__
 		sprintf(filename, "ux0:data/hota/" ISO_PREFIX "%02d.ogg", track + 1);
 #else
 		sprintf(filename, ISO_PREFIX "%02d.ogg", track + 1);
@@ -104,7 +104,7 @@ static void play_music_track_mp3(int track, int loop)
 	}
 	LOG(("playing mp3 %s\n", filename));
 
-#ifdef __PSP2__
+#ifdef __vita__
 	struct stat info;
 	stat(filename, &info);
 	f = fopen(filename, "rb");

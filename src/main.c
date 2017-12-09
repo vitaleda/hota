@@ -40,7 +40,7 @@
 #include "animation.h"
 #include "getopt.h"
 
-#ifdef __PSP2__
+#ifdef __vita__
 #define VITA_BTN_TRIANGLE 0
 #define VITA_BTN_CIRCLE 1
 #define VITA_BTN_CROSS 2
@@ -57,7 +57,7 @@
 
 static char *VERSION = "1.2.4";
 
-#ifdef __PSP2__
+#ifdef __vita__
 static char *QUICKSAVE_FILENAME = "ux0:data/hota/quicksave";
 static char *SWITCH_FILENAME = "ux0:data/hota/temp";
 #else
@@ -126,7 +126,7 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Surface *_screen;
 SDL_Texture *texture;
-#elif __PSP2__
+#elif __vita__
 SDL_Surface *mainScreen;
 #endif
 SDL_Surface *screen;
@@ -168,7 +168,7 @@ static void atexit_callback(void)
 
 static int initialize()
 {
-#ifdef __PSP2__
+#ifdef __vita__
 	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK);
 	SDL_JoystickOpen(0);
 #else
@@ -178,7 +178,7 @@ static int initialize()
 
 	if (cls.nosound == 0)
 	{
-#ifdef __PSP2__
+#ifdef __vita__
 		if (Mix_OpenAudio(48000, AUDIO_S16, 2, 4096) < 0)
 #else
 		if (Mix_OpenAudio(44100, AUDIO_S16, 2, 4096) < 0)
@@ -715,7 +715,7 @@ void check_events()
 			leave_game();
 			break;
 
-#ifdef __PSP2__
+#ifdef __vita__
 			case SDL_JOYBUTTONDOWN:
 			switch (event.jbutton.button)
 			{
@@ -866,7 +866,7 @@ void draw_screen()
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	SDL_RenderPresent(renderer);
-#elif __PSP2__
+#elif __vita__
 	SDL_BlitSurface(screen, NULL, mainScreen, NULL);
 	SDL_Flip(mainScreen);
 #else
@@ -1141,7 +1141,7 @@ int main(int argc, char **argv)
 	cls.scale = 1;
 	cls.filtered = 0;
 	cls.fullscreen = 0;
-#ifdef __PSP2__
+#ifdef __vita__
 	cls.use_iso = 1;
 #else
 	cls.use_iso = 0;

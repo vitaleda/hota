@@ -113,7 +113,7 @@ int read_file(const char *filename, void *out)
 	{
 		if (cls.iso_prefix != NULL)
 		{
-#ifdef __PSP2__
+#ifdef __vita__
 			snprintf(archive, 256, "ux0:/data/hota/%s.iso", cls.iso_prefix);
 #else
 			snprintf(archive, 256, "%s.iso", cls.iso_prefix);
@@ -121,7 +121,7 @@ int read_file(const char *filename, void *out)
 		}
 		else
 		{
-#ifdef __PSP2__
+#ifdef __vita__
 			snprintf(archive, 256, "ux0:/data/hota/%s", ISO_FILENAME);
 #else
 			strcpy(archive, ISO_FILENAME);

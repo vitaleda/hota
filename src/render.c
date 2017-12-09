@@ -38,7 +38,7 @@ extern SDL_Window *window;
 extern SDL_Renderer *renderer;
 extern SDL_Surface *_screen;
 extern SDL_Texture *texture;
-#elif __PSP2__
+#elif __vita__
 extern SDL_Surface *mainScreen;
 #endif
 extern SDL_Surface *screen;
@@ -406,7 +406,7 @@ void render(char *src)
 
 	scroll_reg = 0;
 	SDL_UnlockSurface(screen);
-#if SDL_VERSION_ATLEAST(2, 0, 0) || defined(__PSP2__)
+#if SDL_VERSION_ATLEAST(2, 0, 0) || defined(__vita__)
 	draw_screen();
 #else
 	SDL_Flip(screen);
@@ -541,7 +541,7 @@ void toggle_fullscreen()
 
 int render_create_surface()
 {
-#ifdef __PSP2__
+#ifdef __vita__
 	mainScreen = SDL_SetVideoMode(640, 400, 16, SDL_HWSURFACE|SDL_DOUBLEBUF);
 
 	int sh = 544;
