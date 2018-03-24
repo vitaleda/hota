@@ -41,18 +41,18 @@
 #include "getopt.h"
 
 #ifdef __vita__
-#define VITA_BTN_TRIANGLE 0
-#define VITA_BTN_CIRCLE 1
-#define VITA_BTN_CROSS 2
-#define VITA_BTN_SQUARE 3
-#define VITA_BTN_LTRIGGER 4
-#define VITA_BTN_RTRIGGER 5
-#define VITA_BTN_DOWN 6
-#define VITA_BTN_LEFT 7
-#define VITA_BTN_UP 8
-#define VITA_BTN_RIGHT 9
-#define VITA_BTN_SELECT 10
-#define VITA_BTN_START 11
+#define BTN_TRIANGLE 0
+#define BTN_CIRCLE 1
+#define BTN_CROSS 2
+#define BTN_SQUARE 3
+#define BTN_LTRIGGER 4
+#define BTN_RTRIGGER 5
+#define BTN_DOWN 6
+#define BTN_LEFT 7
+#define BTN_UP 8
+#define BTN_RIGHT 9
+#define BTN_SELECT 10
+#define BTN_START 11
 #endif
 
 static char *VERSION = "1.2.4";
@@ -126,8 +126,6 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Surface *_screen;
 SDL_Texture *texture;
-#elif __vita__
-SDL_Surface *mainScreen;
 #endif
 SDL_Surface *screen;
 
@@ -178,11 +176,7 @@ static int initialize()
 
 	if (cls.nosound == 0)
 	{
-#ifdef __vita__
-		if (Mix_OpenAudio(48000, AUDIO_S16, 2, 4096) < 0)
-#else
 		if (Mix_OpenAudio(44100, AUDIO_S16, 2, 4096) < 0)
-#endif
 		{
 			panic("Mix_OpenAudio failed\n");
 		}
@@ -719,16 +713,16 @@ void check_events()
 			case SDL_JOYBUTTONDOWN:
 			switch (event.jbutton.button)
 			{
-				case VITA_BTN_LEFT: key_left = 1; break;
-				case VITA_BTN_RIGHT: key_right = 1; break;
-				case VITA_BTN_UP: key_up = 1; break;
-				case VITA_BTN_DOWN: key_down = 1; break;
-				case VITA_BTN_CIRCLE: key_a = 1; break;
-				case VITA_BTN_SQUARE: key_b = 1; break;
-				case VITA_BTN_CROSS: key_c = 1; break;
-				case VITA_BTN_LTRIGGER: quickload(QUICKSAVE_FILENAME); break;
-				case VITA_BTN_RTRIGGER: quicksave(QUICKSAVE_FILENAME); break;
-				case VITA_BTN_START:
+				case BTN_LEFT: key_left = 1; break;
+				case BTN_RIGHT: key_right = 1; break;
+				case BTN_UP: key_up = 1; break;
+				case BTN_DOWN: key_down = 1; break;
+				case BTN_CIRCLE: key_a = 1; break;
+				case BTN_SQUARE: key_b = 1; break;
+				case BTN_CROSS: key_c = 1; break;
+				case BTN_LTRIGGER: quickload(QUICKSAVE_FILENAME); break;
+				case BTN_RTRIGGER: quicksave(QUICKSAVE_FILENAME); break;
+				case BTN_START:
 				if (current_room == 7)
 				{
 					quickload(SWITCH_FILENAME);
@@ -744,13 +738,13 @@ void check_events()
 			case SDL_JOYBUTTONUP:
 			switch (event.jbutton.button)
 			{
-				case VITA_BTN_LEFT: key_left = 0; break;
-				case VITA_BTN_RIGHT: key_right = 0; break;
-				case VITA_BTN_UP: key_up = 0; break;
-				case VITA_BTN_DOWN: key_down = 0; break;
-				case VITA_BTN_CIRCLE: key_a = 0; break;
-				case VITA_BTN_SQUARE: key_b = 0; break;
-				case VITA_BTN_CROSS: key_c = 0; break;
+				case BTN_LEFT: key_left = 0; break;
+				case BTN_RIGHT: key_right = 0; break;
+				case BTN_UP: key_up = 0; break;
+				case BTN_DOWN: key_down = 0; break;
+				case BTN_CIRCLE: key_a = 0; break;
+				case BTN_SQUARE: key_b = 0; break;
+				case BTN_CROSS: key_c = 0; break;
 			}
 			break;
 #endif
@@ -864,11 +858,24 @@ void draw_screen()
 	SDL_UnlockTexture(texture);
 	SDL_UpdateTexture(texture, NULL, _screen->pixels, _screen->pitch);
 	SDL_RenderClear(renderer);
+#ifdef __vita__
+	SDL_Rect src;
+	src.x = 0;
+	src.y = 0;
+	src.w = _screen->w;
+	src.h = _screen->h;
+
+	SDL_Rect dst;
+	dst.h = 544;
+	dst.w = (float)src.w * ((float)dst.h / (float)src.h);
+	dst.y = 0;
+	dst.x = (960 - dst.w) / 2;
+
+	SDL_RenderCopy(renderer, texture, &src, &dst);
+#else
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
+#endif
 	SDL_RenderPresent(renderer);
-#elif __vita__
-	SDL_BlitSurface(screen, NULL, mainScreen, NULL);
-	SDL_Flip(mainScreen);
 #else
 	SDL_UpdateRect(screen, 0, 0, 0, 0);
 #endif

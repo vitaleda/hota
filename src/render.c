@@ -38,8 +38,6 @@ extern SDL_Window *window;
 extern SDL_Renderer *renderer;
 extern SDL_Surface *_screen;
 extern SDL_Texture *texture;
-#elif __vita__
-extern SDL_Surface *mainScreen;
 #endif
 extern SDL_Surface *screen;
 
@@ -406,7 +404,7 @@ void render(char *src)
 
 	scroll_reg = 0;
 	SDL_UnlockSurface(screen);
-#if SDL_VERSION_ATLEAST(2, 0, 0) || defined(__vita__)
+#if SDL_VERSION_ATLEAST(2, 0, 0)
 	draw_screen();
 #else
 	SDL_Flip(screen);
@@ -541,18 +539,6 @@ void toggle_fullscreen()
 
 int render_create_surface()
 {
-#ifdef __vita__
-	mainScreen = SDL_SetVideoMode(640, 400, 16, SDL_HWSURFACE|SDL_DOUBLEBUF);
-
-	int sh = 544;
-	float sw = (float)mainScreen->w*((float)sh/(float)mainScreen->h);
-	int x = (960 - sw) / 2;
-	SDL_SetVideoModeScaling(x, 0, sw, sh);
-
-	screen = SDL_SetVideoMode(304, 192, 8, SDL_SWSURFACE);
-
-	SDL_ShowCursor(SDL_DISABLE);
-#else
 	if (cls.pandora && (cls.scale == 3))
 	{
 #if SDL_VERSION_ATLEAST(2, 0, 0)
@@ -592,7 +578,6 @@ int render_create_surface()
 	{
 		toggle_fullscreen();
 	}
-#endif
 
 	return 0;
 }

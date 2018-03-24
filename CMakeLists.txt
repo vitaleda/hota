@@ -18,7 +18,11 @@ project(${VITA_APPNAME})
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
 # Flags and includes
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I${VITASDK}/arm-vita-eabi/include/SDL -fno-exceptions")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-exceptions")
+
+include_directories(
+  ${VITASDK}/arm-vita-eabi/include/SDL2
+)
 
 link_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -50,8 +54,8 @@ add_executable(${VITA_APPNAME}
 )
 
 target_link_libraries(${VITA_APPNAME}
-  SDL
-  SDL_mixer
+  SDL2
+  SDL2_mixer
   vorbisfile
   vorbis
   ogg
@@ -63,6 +67,7 @@ target_link_libraries(${VITA_APPNAME}
   SceGxm_stub
   SceHid_stub
   SceSysmodule_stub
+  SceTouch_stub
 )
 
 # Create Vita artifacts

@@ -129,7 +129,7 @@ void play_sample(int index, int volume, int channel)
 
 	LOG(("sample length %d\n", length));
 
-	chunk = Mix_QuickLoad_RAW(cvt.buf, outlen);
+	chunk = Mix_QuickLoad_RAW(cvt.buf, cvt.len_cvt);
 
 	cached_samples[index] = chunk;
 	Mix_PlayChannel(channel, chunk, 0);

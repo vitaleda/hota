@@ -110,7 +110,7 @@ static void play_music_track_mp3(int track, int loop)
 	f = fopen(filename, "rb");
 	mem = (char*)malloc(info.st_size);
 	fread(mem, 1, info.st_size, f);
-	current_track = Mix_LoadMUS_RW(SDL_RWFromMem(mem, info.st_size));
+	current_track = Mix_LoadMUS_RW(SDL_RWFromMem(mem, info.st_size), info.st_size);
 #else
 	current_track = Mix_LoadMUS(filename);
 #endif
