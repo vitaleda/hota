@@ -556,7 +556,7 @@ int render_create_surface()
 	{
 #if SDL_VERSION_ATLEAST(2, 0, 0)
 		window = SDL_CreateWindow("Heart of The Alien Redux", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-			304*cls.scale, 192*cls.scale, SDL_SWSURFACE);
+			304*cls.scale, 192*cls.scale, 0);
 		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 		screen = SDL_CreateRGBSurface(0, 304*cls.scale, 192*cls.scale, 8, 0, 0, 0, 0);
 		_screen = SDL_CreateRGBSurface(0, 304*cls.scale, 192*cls.scale, 32, 0, 0, 0, 0);

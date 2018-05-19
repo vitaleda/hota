@@ -533,7 +533,7 @@ void check_events()
 				break;
 
 				case SDLK_p:
-                if (current_room == 7)
+				if (current_room == 7)
 				{
 					quickload(SWITCH_FILENAME);
 				} else if (current_room != 0)
