@@ -40,6 +40,19 @@
 #include "animation.h"
 #include "getopt.h"
 
+#ifdef __SWITCH__
+#define BTN_A      0
+#define BTN_B      1
+#define BTN_Y      3
+#define BTN_L      6
+#define BTN_R      7
+#define BTN_PLUS  10
+#define BTN_LEFT  12
+#define BTN_UP    13
+#define BTN_RIGHT 14
+#define BTN_DOWN  15
+#endif
+
 static char *VERSION = "1.2.4";
 
 static char *QUICKSAVE_FILENAME = "quicksave";
@@ -146,12 +159,21 @@ static void atexit_callback(void)
 
 static int initialize()
 {
+#ifdef __SWITCH__
+	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK);
+	SDL_JoystickOpen(0);
+#else
 	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
+#endif
 	atexit(atexit_callback);
 
 	if (cls.nosound == 0)
 	{
+#ifdef __SWITCH__
+		if (Mix_OpenAudio(48000, AUDIO_S16, 2, 4096) < 0)
+#else
 		if (Mix_OpenAudio(44100, AUDIO_S16, 2, 4096) < 0)
+#endif
 		{
 			panic("Mix_OpenAudio failed\n");
 		}
@@ -683,6 +705,46 @@ void check_events()
 			case SDL_QUIT:
 			leave_game();
 			break;
+
+#ifdef __SWITCH__
+			case SDL_JOYBUTTONDOWN:
+			switch (event.jbutton.button)
+			{
+				case BTN_LEFT:  key_left = 1; break;
+				case BTN_RIGHT: key_right = 1; break;
+				case BTN_UP:    key_up = 1; break;
+				case BTN_DOWN:  key_down = 1; break;
+				case BTN_A:     key_a = 1; break;
+				case BTN_B:     key_b = 1; break;
+				case BTN_Y:     key_c = 1; break;
+				case BTN_L:     quickload(QUICKSAVE_FILENAME); break;
+				case BTN_R:     quicksave(QUICKSAVE_FILENAME); break;
+				case BTN_PLUS:
+				if (current_room == 7)
+				{
+					quickload(SWITCH_FILENAME);
+				} else if (current_room != 0)
+				{
+					quicksave(SWITCH_FILENAME);
+					next_script = 7;
+				}
+				break;
+			}
+			break;
+
+			case SDL_JOYBUTTONUP:
+			switch (event.jbutton.button)
+			{
+				case BTN_LEFT:  key_left = 0; break;
+				case BTN_RIGHT: key_right = 0; break;
+				case BTN_UP:    key_up = 0; break;
+				case BTN_DOWN:  key_down = 0; break;
+				case BTN_A:     key_a = 0; break;
+				case BTN_B:     key_b = 0; break;
+				case BTN_Y:     key_c = 0; break;
+			}
+			break;
+#endif
 		}
 	}
 }
@@ -1064,10 +1126,17 @@ int main(int argc, char **argv)
 
 	next_script = 0;
 
+#ifdef __SWITCH__
+	cls.scale = 3;
+	cls.filtered = 1;
+	cls.fullscreen = 1;
+	cls.use_iso = 1;
+#else
 	cls.scale = 1;
 	cls.filtered = 0;
 	cls.fullscreen = 0;
 	cls.use_iso = 0;
+#endif
 	cls.speed_throttle = 0;
 	cls.paused = 0;
 	cls.nosound = 0;
