@@ -47,6 +47,7 @@
 #define BTN_L      6
 #define BTN_R      7
 #define BTN_PLUS  10
+#define BTN_MINUS 11
 #define BTN_LEFT  12
 #define BTN_UP    13
 #define BTN_RIGHT 14
@@ -728,6 +729,7 @@ void check_events()
 					quicksave(SWITCH_FILENAME);
 					next_script = 7;
 				}
+				case BTN_MINUS: cls.filtered = !cls.filtered; break;
 				break;
 			}
 			break;
