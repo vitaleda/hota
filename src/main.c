@@ -42,10 +42,11 @@
 
 #ifdef __SWITCH__
 #define BTN_A      0
-#define BTN_B      1
+#define BTN_X      2
 #define BTN_Y      3
 #define BTN_L      6
 #define BTN_R      7
+#define BTN_ZR     9
 #define BTN_PLUS  10
 #define BTN_MINUS 11
 #define BTN_LEFT  12
@@ -715,9 +716,10 @@ void check_events()
 				case BTN_RIGHT: key_right = 1; break;
 				case BTN_UP:    key_up = 1; break;
 				case BTN_DOWN:  key_down = 1; break;
-				case BTN_A:     key_a = 1; break;
-				case BTN_B:     key_b = 1; break;
-				case BTN_Y:     key_c = 1; break;
+				case BTN_A:     key_a = 1; break; // run
+				case BTN_ZR:    key_a = 1; break; // run (alter)
+				case BTN_Y:     key_b = 1; break; // whip
+				case BTN_X:     key_c = 1; break; // jump
 				case BTN_L:     quickload(QUICKSAVE_FILENAME); break;
 				case BTN_R:     quicksave(QUICKSAVE_FILENAME); break;
 				case BTN_PLUS:
@@ -729,8 +731,8 @@ void check_events()
 					quicksave(SWITCH_FILENAME);
 					next_script = 7;
 				}
-				case BTN_MINUS: cls.filtered = !cls.filtered; break;
 				break;
+				case BTN_MINUS: cls.filtered = !cls.filtered; break;
 			}
 			break;
 
@@ -742,8 +744,9 @@ void check_events()
 				case BTN_UP:    key_up = 0; break;
 				case BTN_DOWN:  key_down = 0; break;
 				case BTN_A:     key_a = 0; break;
-				case BTN_B:     key_b = 0; break;
-				case BTN_Y:     key_c = 0; break;
+				case BTN_ZR:    key_a = 0; break;
+				case BTN_Y:     key_b = 0; break;
+				case BTN_X:     key_c = 0; break;
 			}
 			break;
 #endif
