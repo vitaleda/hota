@@ -860,7 +860,23 @@ void draw_screen()
 	SDL_UnlockTexture(texture);
 	SDL_UpdateTexture(texture, NULL, _screen->pixels, _screen->pitch);
 	SDL_RenderClear(renderer);
+#ifdef __SWITCH__
+	SDL_Rect src;
+	src.x = 0;
+	src.y = 0;
+	src.w = _screen->w;
+	src.h = _screen->h;
+
+	SDL_Rect dst;
+	dst.h = 720;
+	dst.w = (float)src.w * ((float)dst.h / (float)src.h);
+	dst.y = 0;
+	dst.x = (1280 - dst.w) / 2;
+
+	SDL_RenderCopy(renderer, texture, &src, &dst);
+#else
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
+#endif
 	SDL_RenderPresent(renderer);
 #else
 	SDL_UpdateRect(screen, 0, 0, 0, 0);
