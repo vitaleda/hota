@@ -171,11 +171,7 @@ static int initialize()
 
 	if (cls.nosound == 0)
 	{
-#ifdef __SWITCH__
-		if (Mix_OpenAudio(48000, AUDIO_S16, 2, 4096) < 0)
-#else
 		if (Mix_OpenAudio(44100, AUDIO_S16, 2, 4096) < 0)
-#endif
 		{
 			panic("Mix_OpenAudio failed\n");
 		}
